@@ -10,6 +10,7 @@ bool Dumper::Dump(std::string filepath)
 {
     char* aob_buffer;
     unsigned int size = Mem::FileToArrayOfBytes(filepath, &aob_buffer);
+    if(size == BAD_RETURN) return false;
     std::ofstream header(filepath + ".h", std::ios::out | std::ios::binary | std::ios::trunc);
     header << "unsigned char aob_dump[] = { ";
     for(unsigned int i = 0; i < size; i++)

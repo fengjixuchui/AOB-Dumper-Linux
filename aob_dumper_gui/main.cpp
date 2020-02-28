@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "dumper.h"
+#define MIN_ASCII 32
+#define MAX_ASCII 255
 
 ALLEGRO_DISPLAY* display;
 ALLEGRO_EVENT_QUEUE* queue;
@@ -8,6 +10,9 @@ ImGuiWindowFlags wf;
 ImFont* roboto;
 ImFont* roboto2;
 char filepath[MAX_FILEPATH];
+bool dumped = false;
+std::string filepath_buf;
+char output_buffer[MAX_FILENAME + MAX_FILENAME];
 
 void Dumper::Draw()
 {
@@ -25,20 +30,39 @@ void Dumper::Draw()
     }
     if(ImGui::Button("Dump"))
     {
-        std::string filepath_buf;
+        filepath_buf = "";
         for(int i = 0; i < sizeof(filepath); i++)
         {
-            if(filepath[i] != 0 && filepath[i] >= 32 && filepath[i] <= 127 && filepath[i] != '\n')
+            if(filepath[i] >= MIN_ASCII && filepath[i] <= MAX_ASCII && filepath[i] != '\n')
                 filepath_buf += filepath[i];
         }
         std::cout << filepath_buf << std::endl;
-        if(Dumper::Dump(filepath_buf))
-        {
-            char output_buffer[MAX_FILENAME + MAX_FILENAME];
-            sprintf(output_buffer, "File dumped to: %s.h", filepath);
-            ImGui::Text(output_buffer);
-        }
+        dumped = Dumper::Dump(filepath_buf);
     }
+
+    if(dumped)
+    {
+        memset(output_buffer, 0x0, sizeof(output_buffer));
+        sprintf(output_buffer, "%s.h", filepath_buf.c_str());
+    }
+
+    else
+    {
+        memset(output_buffer, 0x0, sizeof(output_buffer));
+    }
+
+    if(output_buffer[0] != 0x0 && dumped)
+    {
+        ImGui::Text("File dumped to: "); ImGui::SameLine();
+        ImGui::InputText("##1", output_buffer, sizeof(output_buffer), ImGuiInputTextFlags_ReadOnly);
+    }
+
+    else
+    {
+        ImGui::Text("File not dumped");
+    }
+    
+
     ImGui::PopFont();
     ImGui::End();
 }
