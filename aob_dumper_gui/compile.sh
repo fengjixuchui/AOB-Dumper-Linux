@@ -1,0 +1,1 @@
+g++ -Wformat-security -DIMGUI_USER_CONFIG=\"imconfig_allegro5.h\" main.cpp memory.cpp dumper.cpp pch.cpp imgui/imgui*.cpp -L /usr/lib -lallegro -lallegro_main -lallegro_primitives -o aob_dumper
